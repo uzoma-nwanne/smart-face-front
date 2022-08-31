@@ -19,48 +19,34 @@ const APP_ID = "smartface";
 const MODEL_ID = Clarifai.FACE_DETECT_MODEL;
 //const MODEL_VERSION_ID = 'aa7f35c01e0642fda5cf400f543e7c40';
 
+
+const initialState = {
+  input: "",
+  imageUrl: "",
+  box: {},
+  route: "signin",
+  isSignedIn: false,
+  user: {
+    id: "",
+    name: "",
+    email: "",
+    entries: 0,
+    joined: "",
+  },
+};
+
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      input: "",
-      imageUrl: "",
-      box: {},
-      route: "home",
-      isSignedIn: false,
-      user: {
-        id: "",
-        name: "",
-        email: "",
-        entries: 0,
-        joined: "",
-      },
-    };
+    this.state = initialState;
   }
 
   calculateFaceLocation = (data) => {
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
-    const faces = data.outputs[0].data.regions;
-    const clarifaiFaces = faces.map((face) => face.region_info.bounding_box);
-    const boxes = [];
-    clarifaiFaces.forEach((clarifaiFace, i) => {
-      const box = {
-        leftCol: clarifaiFace.left_col * width,
-        topRow: clarifaiFace.top_row * height,
-        rightCol: width - clarifaiFace.right_col * width,
-        bottomRow: height - clarifaiFace.bottom_row * height,
-      };
-      boxes[i] = box;
-    });
-    
-  
-    const clarifaiFace =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
-    //const image = document.getElementById("inputimage");
-    //const width = Number(image.width);
-    //const height = Number(image.height);
     return {
       leftCol: clarifaiFace.left_col * width,
       topRow: clarifaiFace.top_row * height,
@@ -107,17 +93,31 @@ class App extends Component {
       "https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs",
       requestOptions
     )
-      .then((response) => response.json())
+      .then((response) => {
+        return response.json();
+      })
       .then((result) => {
+        if (result) {
+          fetch("http://localhost:3001/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: this.state.user.id
+            }),
+          })
+            .then((res) => res.json())
+            .then((count) => {
+              this.setState(Object.assign(this.state.user, {entries:count})) 
+            }).catch(err => console.log(err));
+        }
         this.displayFaceBox(this.calculateFaceLocation(result));
-        console.log(result);
       })
       .catch((error) => console.log("error", error));
   };
 
   onRouteChange = (route) => {
     if (route === "signout") {
-      this.setState({ isSignedIn: false });
+      this.setState(initialState);
     } else if (route === "home") {
       this.setState({ isSignedIn: true });
     }
@@ -147,7 +147,10 @@ class App extends Component {
         {route === "home" ? (
           <div>
             <Logo />
-            <Rank />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+            />
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onButtonSubmit={this.onButtonSubmit}
