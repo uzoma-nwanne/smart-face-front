@@ -98,7 +98,7 @@ class App extends Component {
       })
       .then((result) => {
         if (result) {
-          fetch("http://localhost:3001/image", {
+          fetch("https://smart-face-server.herokuapp.com/image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
