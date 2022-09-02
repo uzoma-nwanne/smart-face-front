@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/smart-face-front/static/css/main.de6b91f9.css",
+    "main.js": "/smart-face-front/static/js/main.f087d17c.js",
+    "static/js/787.8c9b6be1.chunk.js": "/smart-face-front/static/js/787.8c9b6be1.chunk.js",
+    "index.html": "/smart-face-front/index.html",
+    "main.de6b91f9.css.map": "/smart-face-front/static/css/main.de6b91f9.css.map",
+    "main.f087d17c.js.map": "/smart-face-front/static/js/main.f087d17c.js.map",
+    "787.8c9b6be1.chunk.js.map": "/smart-face-front/static/js/787.8c9b6be1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.de6b91f9.css",
+    "static/js/main.f087d17c.js"
+  ]
+}
